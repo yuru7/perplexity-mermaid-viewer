@@ -1,0 +1,5 @@
+{
+    "extensionDescription": {
+        "message": "An extension that detects Mermaid diagrams on Perplexity and displays previews in a popup"
+    }
+}

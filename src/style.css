@@ -1,0 +1,144 @@
+.mermaid-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+}
+
+#mermaid-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px;
+    z-index: 10000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    max-height: 97%;
+    max-width: 97%;
+    display: flex;
+    /* flex によりSVGのオーバーラップ部分がスクロール表示になる */
+    flex-direction: column;
+    /* align-items: center; */
+    gap: 4px;
+    visibility: hidden;
+}
+
+#mermaid-sticky-top {
+    /* text-align: right; */
+    display: flex;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    gap: 3px;
+}
+
+.sticky-left {
+    margin-right: auto;
+}
+
+.sticky-right {
+    display: flex;
+    gap: 3px;
+}
+
+.theme-select-label {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+}
+
+.theme-select-label::after {
+    position: absolute;
+    right: 15px;
+    width: 10px;
+    height: 7px;
+    background-color: #535353;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    content: '';
+    pointer-events: none;
+}
+
+.theme-select-label select {
+    appearance: none;
+    /* min-width: 230px; */
+    /* height: 40px; */
+    line-height: 1;
+    font-size: 14px;
+    /* padding: .4em calc(.8em + 30px) .4em .8em; */
+    padding: 7px 44px 7px 14px;
+    border: none;
+    border-bottom: 1px solid #a0a0a0;
+    background-color: #fff;
+    color: #333333;
+    cursor: pointer;
+}
+
+.theme-select-label select:focus {
+    outline: none;
+}
+
+#mermaid-popup-copy,
+#mermaid-popup-download,
+#mermaid-popup-close {
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 4px 6px;
+    cursor: pointer;
+    font-family: monospace;
+}
+
+#mermaid-popup-copy {
+    background-color: #36AE7C;
+}
+
+#mermaid-popup-download {
+    background-color: #187498;
+}
+
+#mermaid-popup-close {
+    background-color: #EB5353;
+}
+
+#mermaid-container {
+    max-height: 100%;
+    max-width: 100%;
+    min-width: 100%;
+    overflow: auto;
+    flex-grow: 1;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.preview-button-wrapper {
+    text-align: center;
+}
+
+.preview-button {
+    font-size: 0.92rem;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+#mermaid-popup.mermaid-dark {
+    background: #1E1E1E;
+}
+
+.mermaid-dark .theme-select-label::after {
+    background-color: #d0d0d0;
+}
+
+.mermaid-dark .theme-select-label select {
+    background-color: #1E1E1E;
+    color: #d0d0d0;
+}
