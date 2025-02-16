@@ -18,8 +18,10 @@
     }
 
     h1 {
-      text-align: center;
+      text-align: left;
       margin: 20px 0;
+      font-weight: bold;
+      font-size: 1.2rem;
     }
 
     p {
@@ -36,8 +38,26 @@
     }
 
     label {
-      display: block;
       margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .label-title {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .label-item {
+      font-weight: 1rem;
+      margin-left: 2px;
+    }
+
+    .label-description {
+      font-size: 0.85rem;
+      margin-top: 2px;
+      margin-left: 3px;
+      color: #444;
     }
 
     select {
@@ -47,23 +67,42 @@
     }
 
     button {
-      padding: 5px 10px;
+      margin-top: 15px;
+      padding: 6px 12px;
       background-color: #007bff;
       color: #fff;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      font-size: 1rem;
     }
 
-    .mt-20 {
-      margin-top: 20px;
-    }
-
-    .main {
+    .wrapper {
       display: flex;
       justify-content: center;
       align-items: center;
       height: 50vh;
+      margin: 0 auto;
+      max-width: 600px;
+    }
+
+    .app-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .options {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+
+    #confirmation-message {
+      display: none;
+      color: green;
+      font-weight: bold;
+      text-align: left;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -86,33 +125,49 @@
         background-color: #0d66c5;
         color: #fff;
       }
+
+      .label-description {
+        color: #c0c0c0;
+      }
+
+      #confirmation-message {
+        color: #0dc53b;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div class="main">
+  <div class="wrapper">
     <form>
-      <div>
-        <h1>Perplexity Mermaid Viewer Options</h1>
-      </div>
-      <div>
-        <label>Default color theme:
-          <select id="theme">
-            <option value="auto">auto</option>
-            <option value="default">default</option>
-            <option value="neutral">neutral</option>
-            <option value="dark">dark</option>
-            <option value="forest">forest</option>
-            <option value="base">base</option>
-          </select>
-        </label>
-      </div>
-      <div class="mt-20">
-        <button type="submit">Save</button>
-      </div>
-      <p id="confirmation-message" style="display:none; color:green; font-weight: bold;">Saved.
-      </p>
+      <header>
+        <div class="app-title">Perplexity Mermaid Viewer</div>
+      </header>
+      <h1>Options</h1>
+      <div class="options">
+        <div>
+          <label>
+            <div class="label-title">Color Theme</div>
+            <div class="label-item">
+              <select id="theme">
+                <option value="auto">auto</option>
+                <option value="default">default</option>
+                <option value="neutral">neutral</option>
+                <option value="dark">dark</option>
+                <option value="forest">forest</option>
+                <option value="base">base</option>
+              </select>
+            </div>
+            <div class="label-description">
+              When set to "auto", either "default" or "dark" is selected according to the OS theme.
+            </div>
+          </label>
+        </div>
+        <div class="submit">
+          <button type="submit">Save</button>
+          <p id="confirmation-message">Saved.</p>
+        </div>
+      </div class="options">
     </form>
   </div>
   <script src="options.js"></script>
