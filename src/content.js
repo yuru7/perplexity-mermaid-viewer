@@ -225,7 +225,7 @@
         const svg = container.firstChild;
         const bbox = svg.getBBox();
         container.style.width = `${bbox.width}px`;
-        container.style.height = `${bbox.height}px`;
+        container.style.height = `${bbox.height + 15}px`;
 
         popup.style.visibility = "visible";
         overlay.style.display = "block";
