@@ -147,7 +147,7 @@
     border: 0;
     border-top: solid 2px;
     border-right: solid 2px;
-    transform: rotate(45deg);
+    transform: rotate(45deg) translate(-20%);
     position: absolute;
     top: 0;
     left: 0;
