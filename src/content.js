@@ -7,7 +7,6 @@
     const ICON_DOWNLOAD = 'assets/download-16.png';
     const ICON_CLOSE = 'assets/close-16.png';
     const ICON_CHECK = 'assets/check-16.png';
-    const THEME_DEFAULT = 'dark';
 
     let overlay, popup, container, themeSelect, canvas = null;
     const downloadLink = document.createElement("a");
@@ -19,7 +18,9 @@
         // 設定読み込み
         return new Promise((resolve) => {
             chrome.storage.local.get('theme', (data) => {
-                config.theme = tmpTheme || data.theme || THEME_DEFAULT;
+                // OSのダークモードを考慮したデフォルト値
+                const defaultTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
+                config.theme = tmpTheme || data.theme || defaultTheme;
                 resolve(config);
             });
         });
@@ -225,6 +226,7 @@
         const svg = container.firstChild;
         const bbox = svg.getBBox();
         container.style.width = `${bbox.width}px`;
+        // HACK: 表示領域が十分な場合でもスクロールバーが表示されてしまうため、少し余裕を加える
         container.style.height = `${bbox.height + 15}px`;
 
         popup.style.visibility = "visible";

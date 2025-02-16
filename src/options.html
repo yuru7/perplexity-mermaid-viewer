@@ -59,12 +59,33 @@
       margin-top: 20px;
     }
 
-    /* ほどよく中央寄せ */
     .main {
       display: flex;
       justify-content: center;
       align-items: center;
       height: 50vh;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #333;
+        color: #fff;
+      }
+
+      form {
+        background-color: #444;
+        color: #fff;
+      }
+
+      select {
+        background-color: #555;
+        color: #fff;
+      }
+
+      button {
+        background-color: #0d66c5;
+        color: #fff;
+      }
     }
   </style>
 </head>
@@ -78,6 +99,7 @@
       <div>
         <label>Default color theme:
           <select id="theme">
+            <option value="auto">auto</option>
             <option value="default">default</option>
             <option value="neutral">neutral</option>
             <option value="dark">dark</option>
