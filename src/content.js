@@ -7,6 +7,7 @@
     const ICON_DOWNLOAD = 'assets/download-16.png';
     const ICON_CLOSE = 'assets/close-16.png';
     const ICON_CHECK = 'assets/check-16.png';
+    const BTN_CHECK_DELAY = 1500;
 
     let overlay, popup, container, themeSelect, canvas = null;
     const downloadLink = document.createElement("a");
@@ -27,7 +28,6 @@
     }
 
     async function initializePopup() {
-        const BTN_CHECK_DELAY = 1300;
 
         // モーダルオーバーレイ
         overlay = document.createElement("div");
@@ -98,12 +98,13 @@
         copyImg.style.verticalAlign = "middle";
         copyBtn.appendChild(copyImg);
 
-        copyBtn.addEventListener("click", async () => {
+        copyBtn.addEventListener("click", async (event) => {
             if (!canvas) {
                 return;
             }
             await copySVGAsPNG();
             // 特定秒数だけボタンをチェック画像に変える
+            showBalloon('Copied!', event.target);
             copyBtn.disabled = true;
             copyImg.src = chrome.runtime.getURL(ICON_CHECK);
             setTimeout(() => {
@@ -123,7 +124,7 @@
         downloadImg.style.verticalAlign = "middle";
         downloadBtn.appendChild(downloadImg);
 
-        downloadBtn.addEventListener("click", () => {
+        downloadBtn.addEventListener("click", (event) => {
             if (!canvas) {
                 return;
             }
@@ -133,6 +134,7 @@
             const filename = `pplx-mermaid-${formattedDateTime}.png`;
             downloadSVGAsPNG(filename);
             // 特定秒数だけボタンをチェック画像に変える
+            showBalloon("Downloading...", event.target);
             downloadBtn.disabled = true;
             downloadImg.src = chrome.runtime.getURL(ICON_CHECK);
             setTimeout(() => {
@@ -276,6 +278,22 @@
         return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function (match, p1) {
             return String.fromCharCode('0x' + p1);
         }));
+    }
+
+    function showBalloon(message, element) {
+        const balloon = document.createElement("div");
+        balloon.textContent = message;
+        balloon.id = "mermaid-action-balloon";
+        // 要素の直上に表示
+        const rect = element.getBoundingClientRect();
+        balloon.style.top = `${rect.top - 40}px`;
+        balloon.style.left = `${rect.left}px`;
+
+        document.body.appendChild(balloon);
+
+        setTimeout(() => {
+            balloon.remove();
+        }, BTN_CHECK_DELAY);
     }
 
     function downloadSVGAsPNG(filename = 'image.png') {

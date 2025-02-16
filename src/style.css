@@ -134,6 +134,17 @@
     background: #1E1E1E;
 }
 
+#mermaid-action-balloon {
+    position: fixed;
+    font-size: 12px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    pointer-events: none;
+    z-index: 10001;
+}
+
 .mermaid-dark .theme-select-label::after {
     background-color: #d0d0d0;
 }
