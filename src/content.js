@@ -8,8 +8,12 @@
     const ICON_CLOSE = 'assets/close-16.png';
     const ICON_CHECK = 'assets/check-16.png';
     const BTN_CHECK_DELAY = 1500;
+    const FULL_BTN_TITLE_ENABLE = "Enter Pan & Zoom";
+    const FULL_BTN_TITLE_DISABLE = "Exit Pan & Zoom";
+    const FULL_BTN_TEXT_ENABLE = "Zoom On";
+    const FULL_BTN_TEXT_DISABLE = "Zoom Off";
 
-    let overlay, popup, container, themeSelect, canvas = null;
+    let overlay, popup, container, themeSelect, canvas, svgPanZoomObj, activeBtn, fullBtn = null;
     const downloadLink = document.createElement("a");
 
     let tmpTheme = null;
@@ -47,12 +51,15 @@
 
         // ボタン類はスティッキーに格納
         const sticky = document.createElement("div");
-        sticky.id = "mermaid-sticky-top";
+        sticky.id = "mermaid-sticky";
         const stickyLeft = document.createElement("div");
+        const stickyCenter = document.createElement("div");
         const stickyRight = document.createElement("div");
         stickyLeft.classList.add("sticky-left");
+        stickyLeft.classList.add("sticky-center");
         stickyRight.classList.add("sticky-right");
         sticky.appendChild(stickyLeft);
+        sticky.appendChild(stickyCenter);
         sticky.appendChild(stickyRight);
 
         // 一時的にテーマを変えるセレクトボックス
@@ -86,6 +93,22 @@
         themeSelectLabel.classList.add("theme-select-label");
         themeSelectLabel.appendChild(themeSelect);
         stickyLeft.appendChild(themeSelectLabel);
+
+        // フル表示ボタン
+        fullBtn = document.createElement("button");
+        fullBtn.id = "mermaid-popup-full";
+        fullBtn.title = FULL_BTN_TITLE_ENABLE;
+        fullBtn.textContent = FULL_BTN_TEXT_ENABLE;
+        fullBtn.addEventListener("click", () => {
+            const svgElement = container.firstChild;
+            if (svgPanZoomObj) {
+                closePopup();
+                activeBtn.click();
+            } else {
+                enterPanZoom(svgElement);
+                document.removeEventListener("click", closePopupOnOutsideClick);
+            }
+        });
 
         // PNGコピー用ボタン
         const copyBtn = document.createElement("button");
@@ -155,6 +178,7 @@
         closeBtn.appendChild(closeImg);
 
         // ボタンボックスにボタンを追加
+        stickyCenter.appendChild(fullBtn);
         stickyRight.appendChild(copyBtn);
         stickyRight.appendChild(downloadBtn);
         stickyRight.appendChild(closeBtn);
@@ -181,13 +205,18 @@
     }
 
     function closePopup() {
+        exitPanZoom();
         popup.style.visibility = "hidden";
         overlay.style.display = "none";
         container.firstChild.remove();
         document.removeEventListener("click", closePopupOnOutsideClick);
+        if (svgPanZoomObj) {
+            svgPanZoomObj.destroy();
+            svgPanZoomObj = null;
+        }
     }
 
-    async function showPopup({ svgContent, btn }) {
+    async function showPopup({ svgContent }) {
         if (!popup) {
             await initializePopup();
         }
@@ -201,7 +230,7 @@
 
         themeSelect.addEventListener("change", (event) => {
             tmpTheme = event.target.value;
-            btn.click();
+            activeBtn.click();
         });
 
         // ダークテーマのクラス設定
@@ -225,20 +254,56 @@
         // 新しいSVG要素を追加
         container.appendChild(svgElement);
 
-        const svg = container.firstChild;
-        const bbox = svg.getBBox();
+        // viewBox属性から幅と高さを取得
+        const viewBox = svgElement.getAttribute("viewBox").split(" ");
+        const bbox = {
+            width: parseFloat(viewBox[2]),
+            height: parseFloat(viewBox[3]),
+        };
         container.style.width = `${bbox.width}px`;
-        // HACK: 表示領域が十分な場合でもスクロールバーが表示されてしまうため、少し余裕を加える
-        container.style.height = `${bbox.height + 15}px`;
+        container.style.height = `${bbox.height}px`;
+        container.dataset.width = bbox.width;
+        container.dataset.height = bbox.height;
+
+        await makeCanvas(svgElement, bbox.width, bbox.height);
 
         popup.style.visibility = "visible";
         overlay.style.display = "block";
-        await makeCanvas(svg);
 
         document.addEventListener("click", closePopupOnOutsideClick);
+
     }
 
-    async function makeCanvas(svg) {
+    function enterPanZoom(svgElement) {
+        popup.style.width = "100%";
+        popup.style.height = "100%";
+        container.style.width = "100%";
+        container.style.height = "100%";
+        svgElement.removeAttribute("style")
+        svgElement.style.width = "100%";
+        svgElement.style.height = "100%";
+        fullBtn.title = FULL_BTN_TITLE_DISABLE;
+        fullBtn.textContent = FULL_BTN_TEXT_DISABLE;
+        if (!svgPanZoomObj) {
+            svgPanZoomObj = svgPanZoom(svgElement, {
+                zoomScaleSensitivity: 0.3,
+                controlIconsEnabled: true,
+            });
+        } else {
+            svgPanZoomObj.enable();
+        }
+    }
+
+    function exitPanZoom() {
+        popup.style.removeProperty("width");
+        popup.style.removeProperty("height");
+        container.style.width = `${container.dataset.width}px`;
+        container.style.height = `${container.dataset.height}px`;
+        fullBtn.title = FULL_BTN_TITLE_ENABLE;
+        fullBtn.textContent = FULL_BTN_TEXT_ENABLE;
+    }
+
+    async function makeCanvas(svg, width, height) {
         const scaleFactor = 1.5; // 解像度の倍率
 
         const svgString = new XMLSerializer().serializeToString(svg);
@@ -248,9 +313,8 @@
         const imgSVG = new Image();
         imgSVG.onload = async () => {
             try {
-                const bbox = svg.getBBox();
-                canvas.width = bbox.width * scaleFactor;
-                canvas.height = bbox.height * scaleFactor;
+                canvas.width = width * scaleFactor;
+                canvas.height = height * scaleFactor;
                 // 背景色設定
                 const config = await getConfig();
                 if (config.theme === 'dark') {
@@ -382,7 +446,8 @@
             // ボタンをクリックしたときにポップアップでプレビューを表示
             btn.addEventListener("click", async (event) => {
                 const svg = await renderMermaidDiagram(block, event);
-                showPopup({ svgContent: svg, btn: event.target });
+                activeBtn = event.target;
+                showPopup({ svgContent: svg });
             });
 
         }

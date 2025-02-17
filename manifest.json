@@ -30,7 +30,8 @@
       ],
       "js": [
         "src/content.js",
-        "assets/mermaid.min.js"
+        "assets/mermaid.min.js",
+        "assets/svg-pan-zoom.min.js"
       ],
       "css": [
         "src/style.css"
