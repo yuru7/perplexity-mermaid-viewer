@@ -106,7 +106,6 @@
                 activeBtn.click();
             } else {
                 enterPanZoom(svgElement);
-                document.removeEventListener("click", closePopupOnOutsideClick);
             }
         });
 
@@ -271,10 +270,10 @@
         overlay.style.display = "block";
 
         document.addEventListener("click", closePopupOnOutsideClick);
-
     }
 
     function enterPanZoom(svgElement) {
+        document.removeEventListener("click", closePopupOnOutsideClick);
         popup.style.width = "100%";
         popup.style.height = "100%";
         container.style.width = "100%";
@@ -446,11 +445,44 @@
             // ボタンをクリックしたときにポップアップでプレビューを表示
             btn.addEventListener("click", async (event) => {
                 const svg = await renderMermaidDiagram(block, event);
+                if (!svg) {
+                    return;
+                }
                 activeBtn = event.target;
                 showPopup({ svgContent: svg });
             });
 
         }
+    }
+
+    // シンタックスエラーをできるだけ回避するための前処理
+    function escapeMermaidSyntax(code) {
+        const firstLine = code.split("\n")[0].trim();
+        // "flowchart" "graph" で始まる場合
+        if (firstLine.startsWith("flowchart") || firstLine.startsWith("graph")) {
+            // 文字列を走査して、[] で囲まれた文字列を " で囲む
+            charArray = Array.from(code);
+            charArray.forEach((char, index) => {
+                if (char === '[') {
+                    let start = index;
+                    let end = charArray.indexOf(']', start);
+                    if (end !== -1) {
+                        for (let i = start; i <= end; i++) {
+                            if (charArray[i] === '"') {
+                                start = -1;
+                                break;
+                            }
+                        }
+                        if (start !== -1) {
+                            charArray[start] = '["';
+                            charArray[end] = '"]';
+                        }
+                    }
+                }
+            });
+            code = charArray.join('');
+        }
+        return code;
     }
 
     // Mermaid をレンダリングし、SVGを返却
@@ -474,16 +506,20 @@
         const codeText = node.textContent.trim();
         const code = codeText.replace(/^```mermaid\s*\n|\n\s*```$/gm, '');
 
+        // シンタックスエラーをできるだけ回避するための前処理
+        const escapedCode = escapeMermaidSyntax(code);
+
         // パースしてエラーがあればアラートを表示
-        const parseResult = await mermaid.parse(code, { suppressErrors: true });
-        if (!parseResult) {
-            console.error('Mermaid syntax error');
-            alert('Mermaid syntax error');
+        try {
+            await mermaid.parse(escapedCode);
+        } catch (error) {
+            const message = error.message;
+            alert(`[Mermaid syntax error]\n\n${message}`);
             return;
         }
 
         // SVGを生成してポップアップに表示
-        const { svg } = await mermaid.render('graphDiv', code);
+        const { svg } = await mermaid.render('graphDiv', escapedCode);
         return svg;
     }
 
