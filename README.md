@@ -9,3 +9,7 @@ It is downloaded using the following command. The version to download is fixed w
 # Mermaid.js ver: 11.4.1
 curl https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js -o mermaid.min.js
 ```
+
+### Copyright
+
+Asset icons by Icons8
