@@ -456,22 +456,34 @@
         if (firstLine.startsWith("flowchart") || firstLine.startsWith("graph")) {
             // 文字列を走査して、[] で囲まれた文字列を " で囲む
             charArray = Array.from(code);
+            let inDoubleQuote = false;
+            let inComment = false;
+            let escapeStartIndex = -1;
+            let escapeEndIndex = -1;
             charArray.forEach((char, index) => {
-                if (char === '[') {
-                    let start = index;
-                    let end = charArray.indexOf(']', start);
-                    if (end !== -1) {
-                        for (let i = start; i <= end; i++) {
-                            if (charArray[i] === '"') {
-                                start = -1;
-                                break;
-                            }
-                        }
-                        if (start !== -1) {
-                            charArray[start] = '["';
-                            charArray[end] = '"]';
-                        }
-                    }
+                if (char === '"' && !inDoubleQuote) {
+                    inDoubleQuote = true;
+                }
+                if (char === '"' && inDoubleQuote) {
+                    inDoubleQuote = false;
+                }
+                if (char === "%" && charArray[index - 1] === "%" && !inDoubleQuote) {
+                    inComment = true;
+                }
+                if (char === "\n") {
+                    inComment = false;
+                }
+                if (char === "[" && !inDoubleQuote && !inComment) {
+                    escapeStartIndex = index;
+                }
+                if (char === "]" && !inDoubleQuote && !inComment) {
+                    escapeEndIndex = index;
+                }
+                if (escapeStartIndex !== -1 && escapeEndIndex !== -1) {
+                    charArray[escapeStartIndex] = '["';
+                    charArray[escapeEndIndex] = '"]';
+                    escapeStartIndex = -1;
+                    escapeEndIndex = -1;
                 }
             });
             code = charArray.join('');
