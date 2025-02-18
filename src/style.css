@@ -79,14 +79,14 @@
 #mermaid-popup-copy,
 #mermaid-popup-download,
 #mermaid-popup-close {
-    padding: 4px 4px;
+    padding: 6px 6px;
     cursor: pointer;
 }
 
 #mermaid-popup-full {
     font-size: 13px;
     border-radius: 3px;
-    padding: 1px 4px;
+    padding: 4px 8px;
     cursor: pointer;
     color: #333;
 }
@@ -114,6 +114,8 @@
 
 .preview-button-wrapper {
     text-align: center;
+    margin-top: -10px;
+    margin-bottom: 6px;
 }
 
 .preview-button {
