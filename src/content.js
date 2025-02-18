@@ -240,18 +240,12 @@
             popup.classList.remove("mermaid-dark");
         }
 
-        // SVGの埋め込み
-        const parser = new DOMParser();
-        const svgDoc = parser.parseFromString(svgContent, "image/svg+xml");
-        const svgElement = svgDoc.documentElement;
-
         // 既存のコンテンツをクリア
-        while (container.firstChild) {
-            container.removeChild(container.firstChild);
-        }
+        container.innerHTML = "";
 
         // 新しいSVG要素を追加
-        container.appendChild(svgElement);
+        container.innerHTML = svgContent;
+        const svgElement = container.firstChild;
 
         // viewBox属性から幅と高さを取得
         const viewBox = svgElement.getAttribute("viewBox").split(" ");
