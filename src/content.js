@@ -461,23 +461,25 @@
             let escapeStartIndex = -1;
             let escapeEndIndex = -1;
             charArray.forEach((char, index) => {
-                if (char === '"' && !inDoubleQuote) {
-                    inDoubleQuote = true;
+                if (!inComment) {
+                    if (char === '"' && !inDoubleQuote) {
+                        inDoubleQuote = true;
+                    } else if (char === '"' && inDoubleQuote) {
+                        inDoubleQuote = false;
+                    }
                 }
-                if (char === '"' && inDoubleQuote) {
-                    inDoubleQuote = false;
-                }
-                if (char === "%" && charArray[index - 1] === "%" && !inDoubleQuote) {
+                if (!inDoubleQuote && char === "%" && charArray[index - 1] === "%") {
                     inComment = true;
                 }
                 if (char === "\n") {
                     inComment = false;
                 }
-                if (char === "[" && !inDoubleQuote && !inComment) {
-                    escapeStartIndex = index;
-                }
-                if (char === "]" && !inDoubleQuote && !inComment) {
-                    escapeEndIndex = index;
+                if (!inDoubleQuote && !inComment) {
+                    if (char === "[") {
+                        escapeStartIndex = index;
+                    } else if (char === "]") {
+                        escapeEndIndex = index;
+                    }
                 }
                 if (escapeStartIndex !== -1 && escapeEndIndex !== -1) {
                     charArray[escapeStartIndex] = '["';
