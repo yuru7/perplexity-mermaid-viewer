@@ -12,4 +12,6 @@ curl https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js -o mermaid.
 
 ### Copyright
 
-Asset icons by Icons8
+- Mermaid by [Knut Sveidqvist](https://github.com/mermaid-js/mermaid)
+- svg-pan-zoom by [Andrea Leofreddi](https://github.com/bumbu/svg-pan-zoom)
+- Asset icons by [Icons8](https://icons8.com)
